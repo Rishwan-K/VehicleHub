@@ -1,5 +1,4 @@
 require("dotenv").config(); // must be first
-console.log("MONGO_URL:", process.env.MONGO_URL);
 
 const express = require("express");
 const http = require("http");
