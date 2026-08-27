@@ -18,11 +18,12 @@ const ratingRouter = require("./routes/ratingRoutes");
 const app = express();
 app.set("trust proxy", 1);
 
+const allowedOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(",").map((origin) => origin.trim())
+  : ["http://localhost:3000"];
+
 const corsOptions = {
-  origin: [
-    "http://localhost:3000",
-    // add your deployed frontend URL here, e.g. "https://vehiclehub.netlify.app"
-  ],
+  origin: allowedOrigins,
   credentials: true,
 };
 
