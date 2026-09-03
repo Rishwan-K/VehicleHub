@@ -1,10 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Row, Col, Image, Tag, Button, Descriptions, Spin, message } from "antd";
-import { MessageOutlined } from "@ant-design/icons";
+import { Row, Col, Image, Tag, Button, Spin, message, Avatar } from "antd";
+import {
+  MessageOutlined,
+  CarOutlined,
+  CalendarOutlined,
+  DashboardOutlined,
+  EnvironmentOutlined,
+  ToolOutlined,
+  ThunderboltOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import { GetVehicleById } from "../../api/vehicles";
 import { StartConversation } from "../../api/chat";
 import { useSelector } from "react-redux";
+
+const STATUS_COLOR = { active: "green", sold: "default", removed: "red" };
 
 const VehicleDetail = () => {
   const { id } = useParams();
@@ -46,16 +57,30 @@ const VehicleDetail = () => {
 
   const isOwnListing = user && String(vehicle.seller?._id) === String(user._id);
 
+  const specs = [
+    { icon: <CarOutlined />, label: "Brand", value: vehicle.brand },
+    { icon: <CarOutlined />, label: "Model", value: vehicle.model },
+    { icon: <CalendarOutlined />, label: "Year", value: vehicle.year },
+    { icon: <ToolOutlined />, label: "Condition", value: vehicle.condition },
+    vehicle.fuelType && { icon: <ThunderboltOutlined />, label: "Fuel Type", value: vehicle.fuelType },
+    vehicle.kmDriven != null && {
+      icon: <DashboardOutlined />,
+      label: "KM Driven",
+      value: vehicle.kmDriven.toLocaleString("en-IN"),
+    },
+    vehicle.location && { icon: <EnvironmentOutlined />, label: "Location", value: vehicle.location },
+  ].filter(Boolean);
+
   return (
     <div className="p-4 md:p-6 lg:p-8">
-      <Row gutter={[24, 24]}>
-        <Col xs={24} md={12}>
+      <Row gutter={[28, 28]}>
+        <Col xs={24} md={13}>
           <Image.PreviewGroup>
             <Row gutter={[8, 8]}>
               <Col span={24}>
                 <Image
                   src={vehicle.images?.[0] || "https://placehold.co/700x450?text=No+Photo"}
-                  style={{ width: "100%", borderRadius: 12, objectFit: "cover", maxHeight: 420 }}
+                  style={{ width: "100%", borderRadius: 10, objectFit: "cover", maxHeight: 420 }}
                 />
               </Col>
               {vehicle.images?.slice(1).map((img, i) => (
@@ -67,52 +92,75 @@ const VehicleDetail = () => {
           </Image.PreviewGroup>
         </Col>
 
-        <Col xs={24} md={12}>
-          <h2 style={{ marginBottom: 4 }}>{vehicle.title}</h2>
-          <h1 style={{ color: "#c41d7f", fontSize: 32, margin: "8px 0" }}>
-            ₹{vehicle.price.toLocaleString("en-IN")}
-          </h1>
-
-          <Tag color={vehicle.status === "active" ? "green" : vehicle.status === "sold" ? "red" : "default"}>
-            {vehicle.status.toUpperCase()}
-          </Tag>
-
-          <Descriptions column={1} bordered size="small" style={{ marginTop: 16 }}>
-            <Descriptions.Item label="Brand">{vehicle.brand}</Descriptions.Item>
-            <Descriptions.Item label="Model">{vehicle.model}</Descriptions.Item>
-            <Descriptions.Item label="Year">{vehicle.year}</Descriptions.Item>
-            <Descriptions.Item label="Category">{vehicle.category}</Descriptions.Item>
-            {vehicle.fuelType && <Descriptions.Item label="Fuel Type">{vehicle.fuelType}</Descriptions.Item>}
-            {vehicle.kmDriven != null && (
-              <Descriptions.Item label="KM Driven">{vehicle.kmDriven.toLocaleString("en-IN")}</Descriptions.Item>
-            )}
-            <Descriptions.Item label="Condition">{vehicle.condition}</Descriptions.Item>
-            {vehicle.location && <Descriptions.Item label="Location">{vehicle.location}</Descriptions.Item>}
-            <Descriptions.Item label="Seller">
-              <Link to={`/profile/${vehicle.seller?._id}`}>{vehicle.seller?.name}</Link>
-            </Descriptions.Item>
-          </Descriptions>
-
-          {vehicle.description && (
-            <div style={{ marginTop: 16 }}>
-              <h4>Description</h4>
-              <p>{vehicle.description}</p>
+        <Col xs={24} md={11}>
+          <div className="vh-card" style={{ padding: 24 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+              <div>
+                <Tag color="blue" style={{ marginBottom: 8 }}>
+                  {vehicle.category}
+                </Tag>
+                <h2 className="vh-heading" style={{ fontSize: 20, margin: 0 }}>
+                  {vehicle.title}
+                </h2>
+              </div>
+              <Tag color={STATUS_COLOR[vehicle.status] || "default"}>{vehicle.status.toUpperCase()}</Tag>
             </div>
-          )}
 
-          {!isOwnListing && vehicle.status === "active" && (
-            <Button
-              type="primary"
-              size="large"
-              icon={<MessageOutlined />}
-              loading={starting}
-              onClick={handleChatWithSeller}
-              style={{ marginTop: 20 }}
-              block
-            >
-              Chat with Seller
-            </Button>
-          )}
+            <span className="vh-price-tag vh-price-tag--lg" style={{ marginTop: 16, display: "inline-block" }}>
+              ₹{vehicle.price.toLocaleString("en-IN")}
+            </span>
+
+            <div style={{ marginTop: 20 }}>
+              {specs.map((s) => (
+                <div className="vh-spec-row" key={s.label}>
+                  <span className="vh-spec-icon">{s.icon}</span>
+                  <span className="vh-spec-label">{s.label}</span>
+                  <span className="vh-spec-value">{s.value}</span>
+                </div>
+              ))}
+            </div>
+
+            {vehicle.description && (
+              <div style={{ marginTop: 20 }}>
+                <p className="vh-eyebrow" style={{ marginBottom: 6 }}>Description</p>
+                <p style={{ color: "var(--vh-ink)", lineHeight: 1.6, margin: 0 }}>{vehicle.description}</p>
+              </div>
+            )}
+
+            <Link to={`/profile/${vehicle.seller?._id}`}>
+              <div
+                style={{
+                  marginTop: 22,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  padding: "12px 14px",
+                  background: "var(--vh-canvas)",
+                  borderRadius: 8,
+                }}
+              >
+                <Avatar icon={<UserOutlined />} style={{ background: "#0E2A47" }} />
+                <div>
+                  <div style={{ fontWeight: 600, color: "var(--vh-ink)" }}>{vehicle.seller?.name}</div>
+                  <div style={{ fontSize: 12, color: "var(--vh-muted)" }}>View seller profile</div>
+                </div>
+              </div>
+            </Link>
+
+            {!isOwnListing && vehicle.status === "active" && (
+              <Button
+                type="primary"
+                size="large"
+                icon={<MessageOutlined />}
+                loading={starting}
+                onClick={handleChatWithSeller}
+                style={{ marginTop: 20 }}
+                block
+              >
+                Chat with Seller
+              </Button>
+            )}
+          </div>
         </Col>
       </Row>
     </div>

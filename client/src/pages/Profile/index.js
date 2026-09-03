@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Card, Row, Col, Form, Input, Button, message, Spin, Rate, List, Avatar, Modal, Input as AntInput, Tag, Empty } from "antd";
+import { Row, Col, Form, Input, Button, message, Spin, Rate, List, Avatar, Modal, Input as AntInput, Empty } from "antd";
 import { StarFilled, EditOutlined } from "@ant-design/icons";
 import { GetPublicProfile, UpdateMyProfile } from "../../api/users";
 import { SubmitRating, GetRatingsForUser } from "../../api/ratings";
 import moment from "moment";
+import VehicleCard from "../../components/VehicleCard";
 
 const Profile = () => {
   const { id } = useParams();
@@ -91,27 +92,32 @@ const Profile = () => {
 
   return (
     <div className="p-4 md:p-6 lg:p-8">
-      <Row gutter={[16, 16]}>
+      <Row gutter={[20, 20]}>
         <Col xs={24} md={8}>
-          <Card>
-            <div style={{ textAlign: "center" }}>
-              <Avatar size={80} style={{ background: "#1677ff", fontSize: 32 }}>
+          <div className="vh-card">
+            <div style={{ height: 72, background: "linear-gradient(120deg, #0b1f35, #123659)" }} />
+            <div style={{ padding: "0 20px 20px", textAlign: "center", marginTop: -36 }}>
+              <Avatar size={72} style={{ background: "#E8963A", color: "#0B1F35", fontWeight: 800, fontSize: 28, border: "3px solid #fff" }}>
                 {profile.name?.[0]}
               </Avatar>
-              <h2 style={{ marginTop: 12, marginBottom: 0 }}>{profile.name}</h2>
-              {profile.location && <p style={{ color: "#888" }}>{profile.location}</p>}
-              <p style={{ color: "#888", fontSize: 13 }}>
+              <h2 className="vh-heading" style={{ marginTop: 12, marginBottom: 0, fontSize: 20 }}>
+                {profile.name}
+              </h2>
+              {profile.location && <p style={{ color: "var(--vh-muted)", margin: "2px 0" }}>{profile.location}</p>}
+              <p style={{ color: "var(--vh-muted)", fontSize: 13 }}>
                 Member since {moment(profile.createdAt).format("MMM YYYY")}
               </p>
 
               <div style={{ margin: "12px 0" }}>
                 {ratingSummary.count > 0 ? (
                   <>
-                    <StarFilled style={{ color: "#fadb14" }} /> <b>{ratingSummary.average}</b> / 5{" "}
-                    <span style={{ color: "#888" }}>({ratingSummary.count} rating{ratingSummary.count !== 1 ? "s" : ""})</span>
+                    <StarFilled style={{ color: "#E8963A" }} /> <b>{ratingSummary.average}</b> / 5{" "}
+                    <span style={{ color: "var(--vh-muted)" }}>
+                      ({ratingSummary.count} rating{ratingSummary.count !== 1 ? "s" : ""})
+                    </span>
                   </>
                 ) : (
-                  <span style={{ color: "#888" }}>No ratings yet</span>
+                  <span style={{ color: "var(--vh-muted)" }}>No ratings yet</span>
                 )}
               </div>
 
@@ -129,24 +135,29 @@ const Profile = () => {
             </div>
 
             {isOwnProfile && editing && (
-              <Form form={form} layout="vertical" onFinish={handleSaveProfile} style={{ marginTop: 20 }}>
-                <Form.Item name="name" label="Name" rules={[{ required: true }]}>
-                  <Input />
-                </Form.Item>
-                <Form.Item name="phone" label="Phone">
-                  <Input />
-                </Form.Item>
-                <Form.Item name="location" label="Location">
-                  <Input placeholder="e.g. Coimbatore, Tamil Nadu" />
-                </Form.Item>
-                <Button type="primary" htmlType="submit" block loading={saving}>
-                  Save
-                </Button>
-              </Form>
+              <div style={{ padding: "0 20px 20px" }}>
+                <Form form={form} layout="vertical" onFinish={handleSaveProfile} requiredMark={false}>
+                  <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+                    <Input />
+                  </Form.Item>
+                  <Form.Item name="phone" label="Phone">
+                    <Input />
+                  </Form.Item>
+                  <Form.Item name="location" label="Location">
+                    <Input placeholder="e.g. Coimbatore, Tamil Nadu" />
+                  </Form.Item>
+                  <Button type="primary" htmlType="submit" block loading={saving}>
+                    Save
+                  </Button>
+                </Form>
+              </div>
             )}
-          </Card>
+          </div>
 
-          <Card title={`Reviews${ratings.length ? ` (${ratings.length})` : ""}`} style={{ marginTop: 16 }}>
+          <div className="vh-card" style={{ marginTop: 16, padding: 20 }}>
+            <p className="vh-eyebrow" style={{ marginBottom: 12 }}>
+              Reviews{ratings.length ? ` (${ratings.length})` : ""}
+            </p>
             {ratings.length ? (
               <List
                 dataSource={ratings}
@@ -156,7 +167,8 @@ const Profile = () => {
                       avatar={<Avatar>{r.ratedBy?.name?.[0]}</Avatar>}
                       title={
                         <>
-                          {r.ratedBy?.name} <Rate disabled defaultValue={r.stars} style={{ fontSize: 12, marginLeft: 6 }} />
+                          {r.ratedBy?.name}{" "}
+                          <Rate disabled defaultValue={r.stars} style={{ fontSize: 12, marginLeft: 6 }} />
                         </>
                       }
                       description={r.comment || <i style={{ color: "#bbb" }}>No comment</i>}
@@ -167,43 +179,26 @@ const Profile = () => {
             ) : (
               <Empty description="No reviews yet" />
             )}
-          </Card>
+          </div>
         </Col>
 
         <Col xs={24} md={16}>
-          <Card title={`${isOwnProfile ? "Your" : `${profile.name}'s`} Active Listings`}>
-            {listings.length ? (
-              <Row gutter={[16, 16]}>
-                {listings.map((v) => (
-                  <Col xs={24} sm={12} key={v._id}>
-                    <Card
-                      hoverable
-                      onClick={() => navigate(`/vehicle/${v._id}`)}
-                      cover={
-                        <img
-                          alt={v.title}
-                          src={v.images?.[0] || "https://placehold.co/400x250?text=No+Photo"}
-                          style={{ height: 140, objectFit: "cover" }}
-                        />
-                      }
-                    >
-                      <Card.Meta
-                        title={v.title}
-                        description={
-                          <>
-                            <p style={{ margin: 0, fontWeight: 700 }}>₹{v.price.toLocaleString("en-IN")}</p>
-                            <Tag color="blue">{v.category}</Tag>
-                          </>
-                        }
-                      />
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            ) : (
+          <h3 className="vh-heading" style={{ fontSize: 18, marginBottom: 16 }}>
+            {isOwnProfile ? "Your" : `${profile.name}'s`} Active Listings
+          </h3>
+          {listings.length ? (
+            <Row gutter={[20, 28]}>
+              {listings.map((v) => (
+                <Col xs={24} sm={12} key={v._id}>
+                  <VehicleCard vehicle={v} imageHeight={150} onClick={() => navigate(`/vehicle/${v._id}`)} />
+                </Col>
+              ))}
+            </Row>
+          ) : (
+            <div className="vh-card" style={{ padding: 40 }}>
               <Empty description="No active listings" />
-            )}
-          </Card>
+            </div>
+          )}
         </Col>
       </Row>
 
@@ -214,7 +209,7 @@ const Profile = () => {
         onOk={handleSubmitRating}
         confirmLoading={ratingSubmitting}
       >
-        <Rate value={rateStars} onChange={setRateStars} style={{ fontSize: 28 }} />
+        <Rate value={rateStars} onChange={setRateStars} style={{ fontSize: 28, color: "#E8963A" }} />
         <AntInput.TextArea
           rows={3}
           placeholder="Optional comment about your experience..."

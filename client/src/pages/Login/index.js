@@ -1,9 +1,10 @@
 import React from "react";
-import { Form, Input, Button, message, Card } from "antd";
+import { Form, Input, Button, message } from "antd";
 import { useNavigate, Link } from "react-router-dom";
 import { LoginUser } from "../../api/users";
 import { useDispatch } from "react-redux";
 import { ShowLoading, HideLoading } from "../../redux/loaderSlice";
+import AuthLayout from "../../components/AuthLayout";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -28,27 +29,35 @@ const Login = () => {
   };
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f5f5f5" }}>
-      <Card title="🚗 VehicleHub — Login" style={{ width: 380 }}>
-        <Form layout="vertical" onFinish={onFinish}>
-          <Form.Item name="email" label="Email" rules={[{ required: true, type: "email" }]}>
-            <Input size="large" />
-          </Form.Item>
-          <Form.Item name="password" label="Password" rules={[{ required: true }]}>
-            <Input.Password size="large" />
-          </Form.Item>
-          <div style={{ textAlign: "right", marginBottom: 16 }}>
-            <Link to="/forgot-password">Forgot password?</Link>
-          </div>
-          <Button type="primary" htmlType="submit" block size="large">
-            Login
-          </Button>
-        </Form>
-        <p style={{ marginTop: 16, textAlign: "center" }}>
-          New here? <Link to="/register">Create an account</Link>
-        </p>
-      </Card>
-    </div>
+    <AuthLayout
+      eyebrow="Welcome back"
+      title="Pick up right where you left off."
+      subtitle="Log in to message sellers, manage your listings, and track your saved searches."
+    >
+      <h2 className="vh-heading" style={{ fontSize: 24, marginBottom: 4 }}>
+        Log in
+      </h2>
+      <p style={{ color: "var(--vh-muted)", marginBottom: 24 }}>
+        New to VehicleHub? <Link to="/register">Create an account</Link>
+      </p>
+
+      <Form layout="vertical" onFinish={onFinish} requiredMark={false}>
+        <Form.Item name="email" label="Email" rules={[{ required: true, type: "email" }]}>
+          <Input size="large" placeholder="you@example.com" />
+        </Form.Item>
+        <Form.Item name="password" label="Password" rules={[{ required: true }]}>
+          <Input.Password size="large" placeholder="••••••••" />
+        </Form.Item>
+        <div style={{ textAlign: "right", marginBottom: 20, marginTop: -8 }}>
+          <Link to="/forgot-password" style={{ fontSize: 13 }}>
+            Forgot password?
+          </Link>
+        </div>
+        <Button type="primary" htmlType="submit" block size="large">
+          Log in
+        </Button>
+      </Form>
+    </AuthLayout>
   );
 };
 
