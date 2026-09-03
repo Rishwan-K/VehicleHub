@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, InputNumber, Select, Button, Upload, message, Card } from "antd";
+import { Form, Input, InputNumber, Select, Button, Upload, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { CreateListing, GetLocations } from "../../api/vehicles";
@@ -7,6 +7,15 @@ import { UploadImages } from "../../api/upload";
 
 const CATEGORIES = ["Car", "Bike", "Truck", "Bus", "Auto Rickshaw", "Other"];
 const FUEL_TYPES = ["Petrol", "Diesel", "Electric", "CNG", "Other"];
+
+const SectionHeader = ({ children }) => (
+  <p
+    className="vh-eyebrow"
+    style={{ margin: "0 0 16px", paddingBottom: 8, borderBottom: "1px solid var(--vh-line)" }}
+  >
+    {children}
+  </p>
+);
 
 const PostAd = () => {
   const navigate = useNavigate();
@@ -53,9 +62,17 @@ const PostAd = () => {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8" style={{ maxWidth: 700, margin: "0 auto" }}>
-      <Card title="Post an Ad">
-        <Form layout="vertical" onFinish={onFinish}>
+    <div className="p-4 md:p-6 lg:p-8" style={{ maxWidth: 720, margin: "0 auto" }}>
+      <h2 className="vh-heading" style={{ fontSize: 22, marginBottom: 4 }}>
+        Post an ad
+      </h2>
+      <p style={{ color: "var(--vh-muted)", marginBottom: 24 }}>
+        Give buyers the details they'll actually want to know.
+      </p>
+
+      <div className="vh-card" style={{ padding: 28 }}>
+        <Form layout="vertical" onFinish={onFinish} requiredMark={false}>
+          <SectionHeader>Basic info</SectionHeader>
           <Form.Item name="title" label="Ad Title" rules={[{ required: true }]}>
             <Input placeholder="e.g. 2019 Maruti Swift VXi — well maintained" size="large" />
           </Form.Item>
@@ -76,6 +93,7 @@ const PostAd = () => {
             <InputNumber min={1980} max={2100} style={{ width: "100%" }} size="large" />
           </Form.Item>
 
+          <SectionHeader>Pricing &amp; condition</SectionHeader>
           <Form.Item name="price" label="Price (₹)" rules={[{ required: true }]}>
             <InputNumber min={0} style={{ width: "100%" }} size="large" />
           </Form.Item>
@@ -113,11 +131,12 @@ const PostAd = () => {
             <Input.TextArea rows={4} placeholder="Describe the vehicle's condition, service history, etc." />
           </Form.Item>
 
+          <SectionHeader>Photos</SectionHeader>
           <Form.Item label="Photos (up to 8)">
             <Upload
               listType="picture-card"
               fileList={fileList}
-              beforeUpload={() => false} // don't auto-upload; we send them on submit
+              beforeUpload={() => false}
               onChange={({ fileList: fl }) => setFileList(fl.slice(0, 8))}
               multiple
             >
@@ -130,11 +149,11 @@ const PostAd = () => {
             </Upload>
           </Form.Item>
 
-          <Button type="primary" htmlType="submit" size="large" block loading={submitting}>
+          <Button type="primary" htmlType="submit" size="large" block loading={submitting} style={{ marginTop: 8 }}>
             Post Listing
           </Button>
         </Form>
-      </Card>
+      </div>
     </div>
   );
 };

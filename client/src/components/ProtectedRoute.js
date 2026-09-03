@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { GetCurrentUser } from "../api/users";
 import { SetUser } from "../redux/userSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { HideLoading, ShowLoading } from "../redux/loaderSlice";
 import {
   HomeOutlined,
@@ -19,6 +19,7 @@ const ProtectedRoute = ({ children, adminOnly }) => {
   const { user } = useSelector((state) => state.users);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const getValidUser = async () => {
     try {
@@ -46,7 +47,12 @@ const ProtectedRoute = ({ children, adminOnly }) => {
   }, []);
 
   if (adminOnly && user && user.role !== "admin") {
-    return <h2 style={{ padding: 20 }}>Access Denied</h2>;
+    return (
+      <div style={{ padding: 60, textAlign: "center" }}>
+        <h2 className="vh-heading">Access denied</h2>
+        <p style={{ color: "var(--vh-muted)" }}>This area is for admins only.</p>
+      </div>
+    );
   }
 
   const handleMenuClick = ({ key }) => {
@@ -62,6 +68,16 @@ const ProtectedRoute = ({ children, adminOnly }) => {
       navigate("/login");
     }
   };
+
+  const pathToKey = {
+    "/home": "home",
+    "/post-ad": "post-ad",
+    "/my-listings": "my-listings",
+    "/chats": "chats",
+    "/profile": "profile",
+    "/admin": "admin",
+  };
+  const selectedKey = pathToKey[location.pathname];
 
   const navItems = [
     { key: "home", label: "Browse", icon: <HomeOutlined /> },
@@ -79,19 +95,23 @@ const ProtectedRoute = ({ children, adminOnly }) => {
     user && (
       <Layout className="app-layout" style={{ minHeight: "100vh" }}>
         <Header className="app-header" style={{ display: "flex", alignItems: "center" }}>
-          <div
-            className="logo"
-            onClick={() => navigate("/home")}
-            style={{ color: "#fff", fontWeight: 700, fontSize: 20, marginRight: 24, cursor: "pointer" }}
-          >
-            🚗 VehicleHub
+          <div className="app-logo" onClick={() => navigate("/home")}>
+            <span className="app-logo-mark">V</span>
+            <span className="app-logo-text">VehicleHub</span>
           </div>
-          <Menu theme="dark" mode="horizontal" items={navItems} onClick={handleMenuClick} style={{ flex: 1 }} />
+          <Menu
+            theme="dark"
+            mode="horizontal"
+            items={navItems}
+            selectedKeys={selectedKey ? [selectedKey] : []}
+            onClick={handleMenuClick}
+            style={{ flex: 1, minWidth: 0, background: "transparent", borderBottom: "none" }}
+          />
         </Header>
 
         <div className="app-content">{children}</div>
 
-        <Footer style={{ textAlign: "center" }}>© 2026 VehicleHub Powered By Rahman Traders</Footer>
+        <Footer className="app-footer">© 2026 VehicleHub — buy and sell vehicles directly</Footer>
       </Layout>
     )
   );

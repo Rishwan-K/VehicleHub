@@ -1,9 +1,10 @@
 import React from "react";
-import { Form, Input, Button, message, Card } from "antd";
+import { Form, Input, Button, message } from "antd";
 import { useNavigate, Link } from "react-router-dom";
 import { ForgotPassword } from "../../api/users";
 import { useDispatch } from "react-redux";
 import { ShowLoading, HideLoading } from "../../redux/loaderSlice";
+import AuthLayout from "../../components/AuthLayout";
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
@@ -27,24 +28,31 @@ const ForgotPasswordPage = () => {
   };
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f5f5f5" }}>
-      <Card title="🚗 VehicleHub — Forgot Password" style={{ width: 380 }}>
-        <p style={{ color: "#888", marginBottom: 16 }}>
-          Enter your account email and we'll send you a one-time code to reset your password.
-        </p>
-        <Form layout="vertical" onFinish={onFinish}>
-          <Form.Item name="email" label="Email" rules={[{ required: true, type: "email" }]}>
-            <Input size="large" />
-          </Form.Item>
-          <Button type="primary" htmlType="submit" block size="large">
-            Send OTP
-          </Button>
-        </Form>
-        <p style={{ marginTop: 16, textAlign: "center" }}>
-          <Link to="/login">Back to login</Link>
-        </p>
-      </Card>
-    </div>
+    <AuthLayout
+      eyebrow="Account recovery"
+      title="Forgot your password? It happens."
+      subtitle="We'll email you a one-time code so you can set a new password in under a minute."
+    >
+      <h2 className="vh-heading" style={{ fontSize: 24, marginBottom: 4 }}>
+        Reset your password
+      </h2>
+      <p style={{ color: "var(--vh-muted)", marginBottom: 24 }}>
+        Enter your account email and we'll send a one-time code.
+      </p>
+
+      <Form layout="vertical" onFinish={onFinish} requiredMark={false}>
+        <Form.Item name="email" label="Email" rules={[{ required: true, type: "email" }]}>
+          <Input size="large" placeholder="you@example.com" />
+        </Form.Item>
+        <Button type="primary" htmlType="submit" block size="large">
+          Send OTP
+        </Button>
+      </Form>
+
+      <p style={{ marginTop: 20, textAlign: "center" }}>
+        <Link to="/login">Back to login</Link>
+      </p>
+    </AuthLayout>
   );
 };
 

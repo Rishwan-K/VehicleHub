@@ -18,13 +18,6 @@ const Chat = () => {
   const [sending, setSending] = useState(false);
   const bottomRef = useRef(null);
 
-  // Prevents duplicates: the same message can arrive both as the direct API
-  // response (when you're the sender) AND as a socket "new-message" broadcast
-  // (since the sender is also joined to their own chat room). Only add it once.
-  const addMessageIfNew = (msg) => {
-    setMessages((prev) => (prev.some((m) => m._id === msg._id) ? prev : [...prev, msg]));
-  };
-
   const loadConversations = async () => {
     setLoadingConvos(true);
     const response = await GetMyConversations();
@@ -58,7 +51,7 @@ const Chat = () => {
 
     const handleNewMessage = (msg) => {
       if (msg.conversation === activeId) {
-        addMessageIfNew(msg);
+        setMessages((prev) => [...prev, msg]);
       }
     };
     socket.on("new-message", handleNewMessage);
@@ -82,9 +75,8 @@ const Chat = () => {
       if (response?.success) {
         setText("");
         // We'll also get this back via the socket broadcast, but add it
-        // immediately for a snappy feel — addMessageIfNew skips it if the
-        // socket echo already arrived (or will skip the echo if this ran first).
-        addMessageIfNew(response.data);
+        // immediately for a snappy feel in case of any latency.
+        setMessages((prev) => [...prev, response.data]);
         loadConversations(); // refresh "last message" preview in the sidebar
       } else {
         message.error(response?.message || "Could not send message");
@@ -118,7 +110,7 @@ const Chat = () => {
                     onClick={() => setActiveId(c._id)}
                     style={{
                       cursor: "pointer",
-                      background: c._id === activeId ? "#f0f5ff" : "transparent",
+                      background: c._id === activeId ? "#E4EAF0" : "transparent",
                       padding: 12,
                     }}
                   >
@@ -165,7 +157,7 @@ const Chat = () => {
                       >
                         <div
                           style={{
-                            background: isMine ? "#1677ff" : "#f0f0f0",
+                            background: isMine ? "#0E2A47" : "#F4F6F8",
                             color: isMine ? "#fff" : "#000",
                             padding: "8px 12px",
                             borderRadius: 12,

@@ -59,7 +59,7 @@ const Admin = () => {
       title: "Status",
       dataIndex: "status",
       render: (s) => (
-        <Tag color={s === "active" ? "green" : s === "sold" ? "red" : "default"}>{s.toUpperCase()}</Tag>
+        <Tag color={s === "active" ? "green" : s === "sold" ? "default" : "red"}>{s.toUpperCase()}</Tag>
       ),
     },
     {
@@ -105,30 +105,39 @@ const Admin = () => {
 
   return (
     <div className="p-4 md:p-6 lg:p-8">
-      <Tabs
-        items={[
-          {
-            key: "listings",
-            label: "All Listings",
-            children: (
-              <Table
-                rowKey="_id"
-                columns={vehicleColumns}
-                dataSource={vehicles}
-                loading={loadingVehicles}
-                scroll={{ x: true }}
-              />
-            ),
-          },
-          {
-            key: "users",
-            label: "Users",
-            children: (
-              <Table rowKey="_id" columns={userColumns} dataSource={users} loading={loadingUsers} scroll={{ x: true }} />
-            ),
-          },
-        ]}
-      />
+      <h2 className="vh-heading" style={{ fontSize: 22, marginBottom: 4 }}>
+        Admin dashboard
+      </h2>
+      <p style={{ color: "var(--vh-muted)", marginBottom: 24 }}>
+        Moderate listings and manage user accounts.
+      </p>
+
+      <div className="vh-card" style={{ padding: 20 }}>
+        <Tabs
+          items={[
+            {
+              key: "listings",
+              label: "All Listings",
+              children: (
+                <Table
+                  rowKey="_id"
+                  columns={vehicleColumns}
+                  dataSource={vehicles}
+                  loading={loadingVehicles}
+                  scroll={{ x: true }}
+                />
+              ),
+            },
+            {
+              key: "users",
+              label: "Users",
+              children: (
+                <Table rowKey="_id" columns={userColumns} dataSource={users} loading={loadingUsers} scroll={{ x: true }} />
+              ),
+            },
+          ]}
+        />
+      </div>
     </div>
   );
 };

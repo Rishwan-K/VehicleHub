@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, InputNumber, Select, Button, Upload, message, Card, Spin, Image } from "antd";
+import { Form, Input, InputNumber, Select, Button, Upload, message, Spin, Image } from "antd";
 import { UploadOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import { GetVehicleById, UpdateListing } from "../../api/vehicles";
@@ -8,6 +8,15 @@ import { useSelector } from "react-redux";
 
 const CATEGORIES = ["Car", "Bike", "Truck", "Bus", "Auto Rickshaw", "Other"];
 const FUEL_TYPES = ["Petrol", "Diesel", "Electric", "CNG", "Other"];
+
+const SectionHeader = ({ children }) => (
+  <p
+    className="vh-eyebrow"
+    style={{ margin: "0 0 16px", paddingBottom: 8, borderBottom: "1px solid var(--vh-line)" }}
+  >
+    {children}
+  </p>
+);
 
 const EditListing = () => {
   const { id } = useParams();
@@ -89,9 +98,17 @@ const EditListing = () => {
   if (loading) return <Spin size="large" style={{ display: "block", margin: "80px auto" }} />;
 
   return (
-    <div className="p-4 md:p-6 lg:p-8" style={{ maxWidth: 700, margin: "0 auto" }}>
-      <Card title="Edit Listing">
-        <Form form={form} layout="vertical" onFinish={onFinish}>
+    <div className="p-4 md:p-6 lg:p-8" style={{ maxWidth: 720, margin: "0 auto" }}>
+      <h2 className="vh-heading" style={{ fontSize: 22, marginBottom: 4 }}>
+        Edit listing
+      </h2>
+      <p style={{ color: "var(--vh-muted)", marginBottom: 24 }}>
+        Update the details below and save your changes.
+      </p>
+
+      <div className="vh-card" style={{ padding: 28 }}>
+        <Form form={form} layout="vertical" onFinish={onFinish} requiredMark={false}>
+          <SectionHeader>Basic info</SectionHeader>
           <Form.Item name="title" label="Ad Title" rules={[{ required: true }]}>
             <Input size="large" />
           </Form.Item>
@@ -112,6 +129,7 @@ const EditListing = () => {
             <InputNumber min={1980} max={2100} style={{ width: "100%" }} size="large" />
           </Form.Item>
 
+          <SectionHeader>Pricing &amp; condition</SectionHeader>
           <Form.Item name="price" label="Price (₹)" rules={[{ required: true }]}>
             <InputNumber min={0} style={{ width: "100%" }} size="large" />
           </Form.Item>
@@ -142,6 +160,7 @@ const EditListing = () => {
             <Input.TextArea rows={4} />
           </Form.Item>
 
+          <SectionHeader>Photos</SectionHeader>
           <Form.Item label="Current Photos">
             {existingImages.length ? (
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -160,7 +179,7 @@ const EditListing = () => {
                 ))}
               </div>
             ) : (
-              <p style={{ color: "#888" }}>No photos left — add some below.</p>
+              <p style={{ color: "var(--vh-muted)" }}>No photos left — add some below.</p>
             )}
           </Form.Item>
 
@@ -181,11 +200,11 @@ const EditListing = () => {
             </Upload>
           </Form.Item>
 
-          <Button type="primary" htmlType="submit" size="large" block loading={submitting}>
+          <Button type="primary" htmlType="submit" size="large" block loading={submitting} style={{ marginTop: 8 }}>
             Save Changes
           </Button>
         </Form>
-      </Card>
+      </div>
     </div>
   );
 };
